@@ -9,10 +9,10 @@ export function AddTask() {
     const descriptionRef = useRef()
     const statusRef = useRef()
 
-    const taskTitleError = useMemo (() => {
-        if(taskTitle.trim()) 
+    const taskTitleError = useMemo(() => {
+        if (!taskTitle.trim())
             return "Il nome della task non può essere vuoto"
-        if([...taskTitle].some(char => symbols.includes(char)))
+        if ([...taskTitle].some(char => symbols.includes(char)))
             return "Il nome della task non può contenere simboli"
         return ""
     }, [taskTitle])
@@ -21,15 +21,16 @@ export function AddTask() {
         event.preventDefault()
         if (taskTitleError)
             return;
+
+        const newTask = {
+            title: taskTitle.trim(),
+            description: descriptionRef.current.value,
+            status: statusRef.current.value,
+        }
+        console.log(newTask)
     }
 
-    const newTask = {
-        title: taskTitle.trim(),
-        description: descriptionRef.current.value,
-        status: statusRef.current.value,
-    }
 
-    console.log(newTask)
 
     return (
         <div>
@@ -44,23 +45,23 @@ export function AddTask() {
                     />
                 </label>
                 {taskTitleError &&
-                    <p style={{color: 'red'}}>{taskTitleError}</p>
+                    <p style={{ color: 'red' }}>{taskTitleError}</p>
                 }
                 <label>
                     Descrizione:
-                    <textarea ref={descriptionRef}/>
+                    <textarea ref={descriptionRef} />
                 </label>
 
                 <label>
                     Stato:
                     <select ref={statusRef} defaultValue="To do">
-                       {["To Do" , "Doing" , "Done"].map((value, index) => (
-                        <option key={index} value={value}> {value}</option>
-                       ))}
+                        {["To Do", "Doing", "Done"].map((value, index) => (
+                            <option key={index} value={value}> {value}</option>
+                        ))}
                     </select>
                 </label>
 
-                <button type="submit" disabled={!taskTitleError}>Aggiungi task</button>
+                <button type="submit" disabled={taskTitleError}>Aggiungi task</button>
             </form>
         </div>
     )
