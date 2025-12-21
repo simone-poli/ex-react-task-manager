@@ -1,9 +1,11 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useContext } from 'react'
+import {GlobalContext} from "../context/GlobalContext"
 
 const symbols = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 
 export function AddTask() {
+    const { addTask } = useContext(GlobalContext)
 
     const [taskTitle, setTaskTitle] = useState("")
     const descriptionRef = useRef()
@@ -17,7 +19,7 @@ export function AddTask() {
         return ""
     }, [taskTitle])
 
-    const handleSubmit = event => {
+    const handleSubmit = async event => {
         event.preventDefault()
         if (taskTitleError)
             return;
@@ -27,7 +29,15 @@ export function AddTask() {
             description: descriptionRef.current.value,
             status: statusRef.current.value,
         }
-        console.log(newTask)
+        try {
+                await addTask(newTask)
+                alert("Task creata!")
+                setTaskTitle("")
+                descriptionRef.current.value = "";
+                statusRef.current.value = "";
+        } catch(error){
+                alert(error.message)
+        }
     }
 
 
@@ -54,7 +64,7 @@ export function AddTask() {
 
                 <label>
                     Stato:
-                    <select ref={statusRef} defaultValue="To do">
+                    <select ref={statusRef} defaultValue="-">
                         {["To Do", "Doing", "Done"].map((value, index) => (
                             <option key={index} value={value}> {value}</option>
                         ))}
