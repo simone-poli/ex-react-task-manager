@@ -35,7 +35,7 @@ export function TaskDetail() {
         const handleUpdate = async updatedTask => {
             try{
                 await updateTask(updatedTask)
-                setShowDeleteModal(false)
+                setShowEditModal(false)
             } catch(error) {
                 console.log(error);
                 alert(error.message);
