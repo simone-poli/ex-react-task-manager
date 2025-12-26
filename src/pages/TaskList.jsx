@@ -1,6 +1,18 @@
-import { useContext, useMemo, useState } from "react"
+import { useCallback, useContext, useMemo, useState } from "react"
 import { GlobalContext } from "../context/GlobalContext"
 import { TaskRow } from "../components/taskRow"
+
+
+function debounce(callback, delay){
+    let timer;
+    return(value) =>  {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            callback(value)
+        }, delay)
+    }
+
+}
 
 
 export function TaskList() {
@@ -10,6 +22,8 @@ export function TaskList() {
 
     const [sortBy, setSortBy] = useState('createdAt')
     const [sortOrder, setSortOrder] = useState(1)
+    const [searchQuery, setSearchQuery] = useState("")
+    const debounceSearch = useCallback(debounce(setSearchQuery, 500), [])
 
 
 
@@ -22,8 +36,10 @@ export function TaskList() {
         }
     }
 
-    const sortedTask = useMemo(() => {
-        return [...tasks].sort((a, b) => {
+    const filteredAndSortedTask = useMemo(() => {
+        return [...tasks]
+        .filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()))
+        .sort((a, b) => {
             let comparison;
 
             if (sortBy === 'title') {
@@ -39,10 +55,15 @@ export function TaskList() {
 
             return comparison * sortOrder;
         })
-    }, [tasks, sortBy, sortOrder])
+    }, [tasks, sortBy, sortOrder, searchQuery])
 
     return (
         <div>
+           <input 
+           type="text" 
+           placeholder="cerca task..."
+           onChange={e => debounceSearch(e.target.value)}
+           />
             <table>
                 <thead>
                     <tr>
@@ -58,7 +79,7 @@ export function TaskList() {
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedTask.map(task => (
+                    {filteredAndSortedTask.map(task => (
                         <TaskRow key={task.id} task={task} />
                     ))}
                 </tbody>
